@@ -1,12 +1,7 @@
-// (ES6) import the required components from modules
-// import the Scene class from the Scenes module
-import Scene from './scenes'; // (more comments in module)
-// import the GameObject class from the GameObject module
-import GameObject from './gameobject'; // (more comments in module)
-// import the Particles class from the Particle module
-import Particle from './particle'; // (more comments in module)
-// import the Ship class from the Ship module
-import Ship from './ship'; // (more comments in module)
+import Scene from './scenes';
+import GameObject from './gameobject';
+import Particle from './particle';
+import Ship from './ship';
 
 // PI_ON_180 is useful for converting degrees to radians,
 // which is the form of angle that computers generally use
@@ -14,25 +9,18 @@ const PI_ON_180 = Math.PI / 180;
 // this is ground level, this is the point where the Starship collides and explodes
 const GROUND_LEVEL = 100;
 
-// create a HTML5 canvas
 const canvas = document.createElement('canvas');
-// get the canvas's 2d context
 const ctx = canvas.getContext('2d');
 
-// Input {
 // object to store all input
 const Input = {};
 // keydown event listener (we only need the code property of the event object)
 window.addEventListener('keydown', ({ code }) => {
-  // set the property of Input named after the code of the character pressed to true
   Input[code] = true;
 });
 window.addEventListener('keyup', ({ code }) => {
-  // set the property of Input named after the code of the character pressed to false
   Input[code] = false;
 });
-// basically, the input object tells us which keys are currently held down
-// }
 
 // Game variables {
 let started = false; // whether or not the game has started yet
@@ -56,11 +44,8 @@ const objective = {
 // images
 // a helper function to make loading images easier and more 'legible'/readable
 function img(src) {
-  // create image object
   const image = new Image();
-  // assign src based on input param
   image.src = src;
-  // return image object
   return image;
 }
 
@@ -87,23 +72,13 @@ const Camera = {
   smoothing: 0.1,
 };
 
-// scene
-// create a scene using the scene class
 const scene = new Scene();
-
-// create a ground GameObject using the ground image and add it to the scene
 const ground = new GameObject(0, 220, 0, Images.ground);
 scene.add(ground);
-
-// create a launchpad GameObject using the launchpad image and add it to the scene
 const launchpad = new GameObject(40, 200, 0, Images.launchpad);
 scene.add(launchpad);
-
-// create a tower GameObject using the tower image and add it to the scene
 const tower = new GameObject(70, 0, 0, Images.tower);
 scene.add(tower);
-
-// create a connector GameObject using the connector image and add it to the scene
 const connector = new GameObject(35, -80, 0, Images.connector);
 scene.add(connector);
 
@@ -116,7 +91,6 @@ function explosion(x, y, spread, count) {
   for (let i = 0; i < fourFifths; i += 1) {
     // create a particle at the x and y coordinates plus a random offset based on half the spread, with a velocity of 100 and a color of rgb(255,165,0) (orange)
     const particle = new Particle(x + Math.random() * spread - spread / 2, y + Math.random() * spread - spread / 2, Math.random() * 360, 100, [255, 165, 0]);
-    // set the particle's start time (when it was created)
     particle.start_time = performance.now();
     // add an update event listener to the particle (called each frame)
     particle.addEventListener('update', function (deltaTime) {
@@ -128,26 +102,18 @@ function explosion(x, y, spread, count) {
         particles.splice(particles.indexOf(this), 1);
       }
     });
-    // add the particle to the array of particles
     particles.push(particle);
   }
   // a fifth of the particles
   for (let i = 0; i < fifth; i += 1) {
-    // create a particle at the x and y coordinates plus a random offset based on the spread, with a velocity of 100 and a color of rgb(255,0,0) (red)
     const particle = new Particle(x + Math.random() * spread * 2 - spread, y + Math.random() * spread * 2 - spread, Math.random() * 360, 100, [255, 0, 0]);
-    // set the particle's start time (when it was created)
     particle.start_time = performance.now();
-    // add an update event listener to the particle (called each frame)
     particle.addEventListener('update', function (deltaTime) {
-      // slowly fade out the particles
       this.colour[3] -= deltaTime * 1;
-      // if the time elapsed between the particle being created and now is greater than 1 second (1000 milliseconds)
       if (performance.now() - particle.start_time > 1000) {
-        // remove the particle from the array of particles
         particles.splice(particles.indexOf(this), 1);
       }
     });
-    // add the particle to the array of particles
     particles.push(particle);
   }
 }
@@ -158,17 +124,14 @@ function ShipUpdate(deltaTime) {
   if (objective.control) {
     // if the W key or the up arrow key or the space bar is pressed
     if (Input.KeyW || Input.ArrowUp || Input.Space) {
-      // add thrust
       this.thrust(deltaTime);
     }
     // if the A key or the left arrow key is pressed
     if (Input.KeyA || Input.ArrowLeft) {
-      // add rotation force to the left
       this.rotate(-deltaTime);
     }
     // if the D key or the right arrow key is pressed
     if (Input.KeyD || Input.ArrowRight) {
-      // add rotation force to the right
       this.rotate(deltaTime);
     }
     // if the Escape key is pressed
@@ -177,18 +140,14 @@ function ShipUpdate(deltaTime) {
       Input.Escape = false;
       // create an explosion
       explosion(ship.x, ship.y, 50, 500);
-      // remove the ship from the scene
       scene.remove(ship);
-      // reset the game after a delay of one second
       setTimeout(reset, 1000);
     }
     // if the ship hits the ground
     if (this.y > GROUND_LEVEL + 50) {
       // create an explosion
       explosion(ship.x, ship.y, 50, 500);
-      // remove the ship from the scene
       scene.remove(ship);
-      // reset the game after a delay of one second
       setTimeout(reset, 1000);
     }
     // if the R key is pressed
@@ -202,7 +161,6 @@ function ShipUpdate(deltaTime) {
 
 // a function to land the bottom of the starship
 function LandBottom(deltaTime) {
-  // remove all velocity
   this.velocity.x = this.velocity.y = this.velocity.rotation = 0;
   // rotate towards 270 (upright)
   this.rotation += (270 - this.rotation) * deltaTime;
@@ -214,9 +172,7 @@ function LandBottom(deltaTime) {
 
 // a function to land the top of the starship
 function LandTop(deltaTime) {
-  // remove gravity
   this.gravity = false;
-  // remove all velocity
   this.velocity.x = this.velocity.y = this.velocity.rotation = 0;
   // rotate towards 270 (upright)
   this.rotation += (270 - this.rotation) * deltaTime;
@@ -229,11 +185,8 @@ function LandTop(deltaTime) {
   if (Math.round(Math.abs(this.x)) === 0 && Math.abs(-98 - this.y) < 1 && Math.abs(270 - this.rotation) < 1) {
     // set x to 0 (an imperceptible change, but important for clean connection to bottom)
     this.x = 0;
-    // set rotation to 270
     this.rotation = 270;
-    // remove this update event listener
     this.removeEventListener('update');
-    // add a new update event listener
     this.addEventListener('update', function () {
       // move towards y = 64
       this.y += (64 - this.y) * deltaTime;
@@ -241,51 +194,36 @@ function LandTop(deltaTime) {
       connector.y += (81 - connector.y) * deltaTime;
       // if 63 <= y <= 65
       if (Math.abs(64 - this.y) < 1) {
-        // remove this update event listener
         this.removeEventListener('update');
-        // set won to true
         won = true;
       }
     });
   }
 }
 
-// create a ship object using the Starship image
 const shipFull = new Ship(0, -60, 0, Images.ship);
 shipFull.rotation = 270; // start upright
 shipFull.addEventListener('update', ShipUpdate); // apply the ShipUpdate function on update
 
 // create a ship variable (let not const so it's value can be changed, note objects are assigned by reference which is why this works)
 let ship = shipFull;
-// add the ship to the scene
 scene.add(ship);
 
-// create a ship top variable using the top half of the Starship image
 const shipTop = new Ship(0, 0, 0, Images.shipTop);
-
-// create a ship bottom variable using the bottom half of the Starship image
 const shipBottom = new Ship(0, 0, 0, Images.shipBottom);
 
-// update function (called every frame before render)
 function Update(deltaTime) {
-  // if the game has started
   if (started) {
-    // if Starship has launched or the countdown has finished
     if (launched || launchTime - performance.now() <= 0) {
-      // if the launched variable is not yet set to true
       if (!launched) {
-        // set the launched variable to true
         launched = true;
         // move and rotate the ship slightly
         ship.x = -20;
         ship.rotation = -95;
       }
-      // update the scene
       scene.update(deltaTime);
     }
-    // if the objective is space
     if (objective.name === 'space') {
-      // if the ship has made it to space
       if (ship.y < objective.y) {
         // update the objective
         objective.name = 'correct position';
@@ -525,7 +463,6 @@ function Render() {
   }
   // }
 }
-
 
 // a function to reset all variables easily (many variables are defined below but still accessible because of hoisting)
 function reset() {
