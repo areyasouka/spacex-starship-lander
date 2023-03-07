@@ -82,6 +82,15 @@ scene.add(tower);
 const connector = new GameObject(35, -80, 0, Images.connector);
 scene.add(connector);
 
+const shipFull = new Ship(0, -60, 0, Images.ship);
+const shipTop = new Ship(0, 0, 0, Images.shipTop);
+const shipBottom = new Ship(0, 0, 0, Images.shipBottom);
+
+shipFull.rotation = 270; // start upright
+// create a ship variable (let not const so it's value can be changed, note objects are assigned by reference which is why this works)
+let ship = shipFull;
+scene.add(ship);
+
 // a function to create an explosion effect with particles
 // takes in the x and y coordinates of the explosion, how far the particles should spread, and how many particles should be created
 function explosion(x, y, spread, count) {
@@ -93,7 +102,7 @@ function explosion(x, y, spread, count) {
     const particle = new Particle(x + Math.random() * spread - spread / 2, y + Math.random() * spread - spread / 2, Math.random() * 360, 100, [255, 165, 0]);
     particle.start_time = performance.now();
     // add an update event listener to the particle (called each frame)
-    particle.addEventListener('update', function (deltaTime) {
+    particle.addEventListener('update', function update(deltaTime) {
       // slowly fade out the particles
       this.colour[3] -= deltaTime * 1;
       // if the time elapsed between the particle being created and now is greater than 1 second (1000 milliseconds)
@@ -108,7 +117,7 @@ function explosion(x, y, spread, count) {
   for (let i = 0; i < fifth; i += 1) {
     const particle = new Particle(x + Math.random() * spread * 2 - spread, y + Math.random() * spread * 2 - spread, Math.random() * 360, 100, [255, 0, 0]);
     particle.start_time = performance.now();
-    particle.addEventListener('update', function (deltaTime) {
+    particle.addEventListener('update', function update(deltaTime) {
       this.colour[3] -= deltaTime * 1;
       if (performance.now() - particle.start_time > 1000) {
         particles.splice(particles.indexOf(this), 1);
@@ -116,6 +125,42 @@ function explosion(x, y, spread, count) {
     });
     particles.push(particle);
   }
+}
+
+// a function to reset all variables easily (many variables are defined below but still accessible because of hoisting)
+function reset() {
+  shipFull.gravity = true; // make sure gravity is enabled
+  shipFull.x = shipFull.velocity.x = shipFull.velocity.y = shipFull.velocity.rotation = 0; // set all velocities and x coordinate of the ship to 0
+  shipFull.y = -60; // set the ship's y to -60 (to align with landing pad etc)
+  shipFull.rotation = 270; // set the ship's rotation to 270 (in the unit circle 270 or 3/2 pi is upright)
+  shipFull.removeEventListener('update');
+  shipTop.gravity = true; // make sure gravity is enabled
+  shipTop.x = shipTop.y = shipTop.rotation = shipTop.velocity.x = shipTop.velocity.y = shipTop.velocity.rotation = 0; // set all velocities and x and y coordinates of the ship top to 0
+  shipTop.removeEventListener('update'); // remove the update event listener from the ship top
+  shipBottom.gravity = true; // make sure gravity is enabled
+  shipBottom.x = shipBottom.y = shipBottom.rotation = shipBottom.velocity.x = shipBottom.velocity.y = shipBottom.velocity.rotation = 0; // set all velocities and x and y coordinates of the ship bottom to 0
+  shipBottom.removeEventListener('update'); // remove the update event listener from the ship top
+  // remove the ships from the scene (doesn't have any impact if they aren't in the scene)
+  scene.remove(shipFull);
+  scene.remove(shipTop);
+  scene.remove(shipBottom);
+  // reset the global variables
+  started = false;
+  launched = false;
+  launchTime = null;
+  starlinksReleased = false;
+  won = false;
+  // reset the default objective
+  objective.name = 'space';
+  objective.text = 'Exit the atmosphere';
+  objective.x = 0;
+  objective.y = -20000;
+  objective.type = 'location';
+  objective.control = true;
+  // reset the ship being used
+  ship = shipFull; // set the ship we are using is the full ship, not one of the parts
+  ship.addEventListener('update', ShipUpdate);
+  scene.add(ship);
 }
 
 // the generic update function for the ship
@@ -158,6 +203,7 @@ function ShipUpdate(deltaTime) {
     }
   }
 }
+shipFull.addEventListener('update', ShipUpdate); // apply the ShipUpdate function on update
 
 // a function to land the bottom of the starship
 function LandBottom(deltaTime) {
@@ -187,7 +233,7 @@ function LandTop(deltaTime) {
     this.x = 0;
     this.rotation = 270;
     this.removeEventListener('update');
-    this.addEventListener('update', function () {
+    this.addEventListener('update', function update() {
       // move towards y = 64
       this.y += (64 - this.y) * deltaTime;
       // move the connected towards y = 81
@@ -200,17 +246,6 @@ function LandTop(deltaTime) {
     });
   }
 }
-
-const shipFull = new Ship(0, -60, 0, Images.ship);
-shipFull.rotation = 270; // start upright
-shipFull.addEventListener('update', ShipUpdate); // apply the ShipUpdate function on update
-
-// create a ship variable (let not const so it's value can be changed, note objects are assigned by reference which is why this works)
-let ship = shipFull;
-scene.add(ship);
-
-const shipTop = new Ship(0, 0, 0, Images.shipTop);
-const shipBottom = new Ship(0, 0, 0, Images.shipBottom);
 
 function Update(deltaTime) {
   if (started) {
@@ -272,9 +307,9 @@ function Update(deltaTime) {
         for (let i = 1; i <= 10; i += 1) {
           const starlink = new GameObject(0, 0, 0, Images.starlink);
           starlink.id = i;
-          starlink.addEventListener('update', function (deltaTime) {
-            this.velocity.x += Math.cos(this.rotation * PI_ON_180) * 15 * deltaTime;
-            this.velocity.y += Math.sin(this.rotation * PI_ON_180) * 15 * deltaTime;
+          starlink.addEventListener('update', function update(deltaTime2) {
+            this.velocity.x += Math.cos(this.rotation * PI_ON_180) * 15 * deltaTime2;
+            this.velocity.y += Math.sin(this.rotation * PI_ON_180) * 15 * deltaTime2;
             if (Math.abs(ship.x - this.x) > canvas.width || Math.abs(ship.y - this.y) > canvas.height) {
               scene.remove(this);
               if (this.id === 10) {
@@ -325,7 +360,7 @@ function Update(deltaTime) {
         const angleInRadians = (ship.rotation + 180) * PI_ON_180;
         const particle = new Particle(ship.x + Math.cos(angleInRadians) * (80 + Math.random() * 40 - 20), ship.y + Math.sin(angleInRadians) * (80 + Math.ceil(Math.random() * 20)), ship.rotation + 180 + Math.random() * 30 - 15, 800, [140, 20, 252]);
         particle.created_at = performance.now();
-        particle.addEventListener('update', function () {
+        particle.addEventListener('update', function update() {
           if (performance.now() - particle.created_at >= 100) {
             particles.splice(particles.indexOf(this), 1);
           }
@@ -347,7 +382,7 @@ function Update(deltaTime) {
     while (stars.length < starCount) {
       const starY = ship.y + Math.random() * canvas.height - canvas.height / 2;
       const star = new Particle(ship.x + Math.random() * canvas.width - canvas.width / 2, starY, Math.random() * 360, 0, [255, 255, 255, starY > -18000 ? 1 - (18000 + starY) / 3000 : 1]);
-      star.addEventListener('update', function (deltaTime) {
+      star.addEventListener('update', function update() {
         if (Math.abs(ship.x - this.x) > canvas.width || Math.abs(ship.y - this.y) > canvas.height) {
           stars.splice(stars.indexOf(this), 1);
         }
@@ -462,42 +497,6 @@ function Render() {
     ctx.fillText(`${(Math.sqrt((ship.x - objective.x) ** 2 + (ship.y - objective.y) ** 2) / 200).toFixed(2)}km to ${objective.name}`, canvas.width / 2, 130);
   }
   // }
-}
-
-// a function to reset all variables easily (many variables are defined below but still accessible because of hoisting)
-function reset() {
-  shipFull.gravity = true; // make sure gravity is enabled
-  shipFull.x = shipFull.velocity.x = shipFull.velocity.y = shipFull.velocity.rotation = 0; // set all velocities and x coordinate of the ship to 0
-  shipFull.y = -60; // set the ship's y to -60 (to align with landing pad etc)
-  shipFull.rotation = 270; // set the ship's rotation to 270 (in the unit circle 270 or 3/2 pi is upright)
-  shipFull.removeEventListener('update');
-  shipTop.gravity = true; // make sure gravity is enabled
-  shipTop.x = shipTop.y = shipTop.rotation = shipTop.velocity.x = shipTop.velocity.y = shipTop.velocity.rotation = 0; // set all velocities and x and y coordinates of the ship top to 0
-  shipTop.removeEventListener('update'); // remove the update event listener from the ship top
-  shipBottom.gravity = true; // make sure gravity is enabled
-  shipBottom.x = shipBottom.y = shipBottom.rotation = shipBottom.velocity.x = shipBottom.velocity.y = shipBottom.velocity.rotation = 0; // set all velocities and x and y coordinates of the ship bottom to 0
-  shipBottom.removeEventListener('update'); // remove the update event listener from the ship top
-  // remove the ships from the scene (doesn't have any impact if they aren't in the scene)
-  scene.remove(shipFull);
-  scene.remove(shipTop);
-  scene.remove(shipBottom);
-  // reset the global variables
-  started = false;
-  launched = false;
-  launchTime = null;
-  starlinksReleased = false;
-  won = false;
-  // reset the default objective
-  objective.name = 'space';
-  objective.text = 'Exit the atmosphere';
-  objective.x = 0;
-  objective.y = -20000;
-  objective.type = 'location';
-  objective.control = true;
-  // reset the ship being used
-  ship = shipFull; // set the ship we are using is the full ship, not one of the parts
-  ship.addEventListener('update', ShipUpdate);
-  scene.add(ship);
 }
 
 // start game on load
