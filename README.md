@@ -1,4 +1,4 @@
-# Unofficial SpaceX Starship Lunar Lander Game
+# Unofficial SpaceX Starship Lander Game
 
 In the genre of Lunar Lander games we simulate launching the SpaceX Starship to orbit,
 deploying Starlink satellites and returning both the booster and upper stage to Earth 
@@ -18,7 +18,16 @@ Let's have fun making games!
 
 https://postmeta.com
 
+### Features
+
+- Booster and Starship separation
+- Starlink launch
+- Land both stages to win!
+  
+<img src="https://raw.githubusercontent.com/areyasouka/spacex-starship-lander/main/docs/screenshot.png" alt="Screenshot showing Starship rocket launch" title="Starship Lander Game " width="640">
+
 ### Build
+
 ```sh
 npm i
 npm run dev
