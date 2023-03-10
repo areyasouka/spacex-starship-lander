@@ -18,6 +18,12 @@ Let's have fun making games!
 
 https://postmeta.com
 
+### Build
+```sh
+npm i
+npm run dev
+```
+
 ### Todo
 
 - use state transitions for stages, cleanup add/remove EventListeners
