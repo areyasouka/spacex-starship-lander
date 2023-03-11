@@ -1,15 +1,14 @@
 # Unofficial SpaceX Starship Lander Game
 
-In the genre of Lunar Lander games we simulate launching the SpaceX Starship to orbit,
+In the genre of [Lunar Lander](https://en.wikipedia.org/wiki/Lunar_Lander_(video_game_genre)) games we simulate launching the SpaceX Starship to orbit,
 deploying Starlink satellites and returning both the booster and upper stage to Earth 
 to be caught on the launch pad.  
 
 Attempt the famous landing flip maneuver.
 
-Try it here: https://spacex-starship-lander.pages.dev/
+**Try it here:** https://spacex-starship-lander.pages.dev/
 
 Original version by https://github.com/Matt-DESTROYER as a Replit bounty project.
-Maintained at https://github.com/areyasouka/spacex-starship-lander
 
 Fork, remix and make your own game!
 Let's have fun making games!
