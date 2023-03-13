@@ -20,7 +20,7 @@ export default class Ship extends GameObject {
   }
 
   rotate(deltaTime) {
-    this.velocity.rotation += ROTATION_SPEED * deltaTime;
+    this.velocity.rotation += ROTATION_SPEED * deltaTime * (this.game.input.rotationAmplification ? this.game.input.rotationAmplification : 1);
   }
 
   updateControl(deltaTime) {

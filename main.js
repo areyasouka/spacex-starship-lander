@@ -22,6 +22,40 @@ window.addEventListener('keyup', ({ code }) => {
   Input[code] = false;
 });
 
+function touchMouseReleased() {
+  Input.ArrowUp = false;
+  Input.ArrowLeft = false;
+  Input.ArrowRight = false;
+  Input.MouseDown = false;
+  Input.rotationAmplification = null;
+}
+
+function setPosition(e) {
+  if (e.type === 'touchstart' || e.type === 'mousedown') {
+    Input.ArrowUp = true;
+    Input.MouseDown = true;
+  }
+  if (e.type === 'touchstart' || e.type === 'touchmove') {
+    Input.x = e.touches[0].clientX;
+    Input.y = e.touches[0].clientY;
+  } else {
+    Input.x = e.clientX;
+    Input.y = e.clientY;
+  }
+  const sideWidth = canvas.width / 2;
+  if (sideWidth > Input.x) {
+    Input.ArrowLeft = true;
+  } else if (sideWidth < Input.x) {
+    Input.ArrowRight = true;
+  }
+  Input.rotationAmplification = Math.abs(sideWidth - Input.x) / ((sideWidth + Input.x) / 2);
+}
+
+canvas.addEventListener('mousedown', setPosition);
+canvas.addEventListener('mouseup', touchMouseReleased);
+canvas.addEventListener('touchstart', setPosition);
+canvas.addEventListener('touchend', touchMouseReleased);
+
 function img(src) {
   const image = new Image();
   image.src = src;
@@ -193,8 +227,9 @@ class Game {
           this.objective.controlShip = null;
         }
       } else if (this.objective.name === 'Stage separation') {
-        if (this.input.KeyE) {
+        if (this.input.KeyE || this.input.MouseDown) {
           this.input.KeyE = false;
+          this.input.MouseDown = false;
           this.shipBottom.x = this.shipTop.x = this.ship.x;
           this.shipBottom.y = this.shipTop.y = this.ship.y;
           this.shipBottom.rotation = this.shipTop.rotation = this.ship.rotation;
@@ -213,15 +248,15 @@ class Game {
           this.ship.addEventListener('update', this.ship.updateControl);
           this.scene.add(this.ship);
           this.scene.add(this.shipBottom);
-          this.input.KeyE = false;
           this.objective.name = 'Starlink satellites';
           this.objective.text = 'Release the starlink satellites (press e)';
           this.objective.type = 'interact';
         }
       } else if (this.objective.name === 'Starlink satellites') {
         this.ship.velocity.x = this.ship.velocity.y = this.ship.velocity.rotation = 0;
-        if (!this.starlinksReleased && this.input.KeyE) {
+        if (!this.starlinksReleased && (this.input.KeyE || this.input.MouseDown)) {
           this.input.KeyE = false;
+          this.input.MouseDown = false;
           for (let i = 1; i <= 10; i += 1) {
             const starlink = new GameObject(0, 0, 0, Images.starlink);
             starlink.id = i;
@@ -254,8 +289,9 @@ class Game {
         }
       } else if (this.objective.name === 'Earth') {
         if (this.objective.text === 'Land the bottom half of the Starship (c to catch Starship)') {
-          if (this.input.KeyC && Math.abs(this.ship.x - this.objective.x) < 50 && Math.abs(this.ship.y - this.objective.y) < 50 && (this.ship.rotation > 250 && this.ship.rotation < 290)) {
+          if ((this.input.KeyC || this.input.MouseDown) && Math.abs(this.ship.x - this.objective.x) < 50 && Math.abs(this.ship.y - this.objective.y) < 50 && (this.ship.rotation > 250 && this.ship.rotation < 290)) {
             this.input.KeyC = false;
+            this.input.MouseDown = false;
             this.ship.removeEventListener('update');
             this.ship.addEventListener('update', this.ship.landBottom);
             this.ship = this.shipTop;
@@ -264,8 +300,9 @@ class Game {
             this.objective.text = 'Land the top half of the Starship (c to catch Starship)';
           }
         } else if (this.objective.text === 'Land the top half of the Starship (c to catch Starship)') {
-          if (this.input.KeyC && Math.abs(this.ship.x - this.objective.x) < 50 && Math.abs(this.ship.y - this.objective.y) < 50 && (this.ship.rotation > 250 && this.ship.rotation < 290)) {
+          if ((this.input.KeyC || this.input.MouseDown) && Math.abs(this.ship.x - this.objective.x) < 50 && Math.abs(this.ship.y - this.objective.y) < 50 && (this.ship.rotation > 250 && this.ship.rotation < 290)) {
             this.input.KeyC = false;
+            this.input.MouseDown = false;
             this.ship.removeEventListener('update');
             this.ship.addEventListener('update', this.ship.landTop);
             this.objective.text = '';
@@ -287,7 +324,7 @@ class Game {
           this.particles.push(particle);
         }
       }
-    } else if (this.input.Space || this.input.Enter) {
+    } else if (this.input.KeyW || this.input.ArrowUp || this.input.Space) {
       this.started = true;
       this.launchTime = performance.now() + 5000;
       this.launched = false;
@@ -332,7 +369,7 @@ class Game {
 
   // render
   Render() {
-    // reset the canvas transform matrix (undo any tranformations/rotations)
+    // reset the canvas transform matrix (undo any transformations/rotations)
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     // Background {
     // scale = the distance between the ship and space scaled to be from 0 to 1
@@ -438,7 +475,7 @@ window.addEventListener('load', () => {
   // performance control/measurement
   const MAX_FRAME = 100; // ensures that physics don't break on slow devices or when tabs are switched
   let previousFrame = 0; // stores the last time that the game loop was run
-  // game loop (an IIFE that returns a function inside the `requestAnimationFrame`)
+  // game loop (an Immediately Invoked Function Expression that returns a function inside the `requestAnimationFrame`)
   window.requestAnimationFrame((function main(currentFrame) {
     // update (pass in `deltaTime`: the time in seconds since the last frame, restricted by an upper bound of 100ms)
     game.Update(Math.min(currentFrame - previousFrame, MAX_FRAME) / 1000);
