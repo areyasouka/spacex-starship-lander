@@ -36,5 +36,5 @@ npm run dev
 
 - use state transitions for stages, cleanup add/remove EventListeners
 - extract input/control from ship class
-- support mobile/touch ux
+- add instructions for mobile/touch ux (maybe too easy tho)
 - add sound fx
