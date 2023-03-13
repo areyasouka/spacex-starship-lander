@@ -28,9 +28,11 @@ function touchMouseReleased() {
   Input.ArrowRight = false;
   Input.MouseDown = false;
   Input.rotationAmplification = null;
+  Input.thrustAmplification = null;
 }
 
 function setPosition(e) {
+  e.preventDefault();
   if (e.type === 'touchstart' || e.type === 'mousedown') {
     Input.ArrowUp = true;
     Input.MouseDown = true;
@@ -49,12 +51,13 @@ function setPosition(e) {
     Input.ArrowRight = true;
   }
   Input.rotationAmplification = Math.abs(sideWidth - Input.x) / ((sideWidth + Input.x) / 2);
+  Input.thrustAmplification = ((canvas.height - Input.y) / canvas.height) * 1.5;
 }
 
-canvas.addEventListener('mousedown', setPosition);
-canvas.addEventListener('mouseup', touchMouseReleased);
-canvas.addEventListener('touchstart', setPosition);
-canvas.addEventListener('touchend', touchMouseReleased);
+window.document.addEventListener('mousedown', setPosition);
+window.document.addEventListener('mouseup', touchMouseReleased);
+window.document.addEventListener('touchstart', setPosition);
+window.document.addEventListener('touchend', touchMouseReleased);
 
 function img(src) {
   const image = new Image();

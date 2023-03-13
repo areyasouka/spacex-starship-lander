@@ -16,11 +16,11 @@ export default class Ship extends GameObject {
 
   thrust(deltaTime) {
     this.velocity.x += Math.cos(this.rotation * PI_ON_180) * THRUST_SPEED * deltaTime;
-    this.velocity.y += Math.sin(this.rotation * PI_ON_180) * THRUST_SPEED * deltaTime;
+    this.velocity.y += Math.sin(this.rotation * PI_ON_180) * THRUST_SPEED * deltaTime * (this.game.input.thrustAmplification || 1);
   }
 
   rotate(deltaTime) {
-    this.velocity.rotation += ROTATION_SPEED * deltaTime * (this.game.input.rotationAmplification ? this.game.input.rotationAmplification : 1);
+    this.velocity.rotation += ROTATION_SPEED * deltaTime * (this.game.input.rotationAmplification || 1);
   }
 
   updateControl(deltaTime) {
