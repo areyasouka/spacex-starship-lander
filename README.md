@@ -4,9 +4,11 @@ In the genre of [Lunar Lander](https://en.wikipedia.org/wiki/Lunar_Lander_(video
 deploying Starlink satellites and returning both the booster and upper stage to Earth 
 to be caught on the launch pad.  
 
-Attempt the famous landing flip maneuver.
+**Try it live here:** https://spacex-starship-lander.pages.dev/
 
-**Try it here:** https://spacex-starship-lander.pages.dev/
+Attempt the famous landing flip maneuver!
+
+Validate the [50% chance](https://www.dailymail.co.uk/sciencetech/article-11858339/Elon-Musk-says-theres-50-chance-SpaceXs-Starship-rocket-EXPLODE-launch.html)  of explosion 🚀🛰🔥 theory.
 
 Original version by https://github.com/Matt-DESTROYER as a Replit bounty project.
 
