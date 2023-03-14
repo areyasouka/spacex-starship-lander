@@ -6,9 +6,8 @@ to be caught on the launch pad.
 
 **Try it live here:** https://spacex-starship-lander.pages.dev/
 
-Attempt the famous landing flip maneuver!
-
-Validate the [50% chance](https://www.dailymail.co.uk/sciencetech/article-11858339/Elon-Musk-says-theres-50-chance-SpaceXs-Starship-rocket-EXPLODE-launch.html)  of explosion 🚀🛰🔥 theory.
+- Attempt the famous landing flip maneuver!
+- Validate the [50% chance](https://www.dailymail.co.uk/sciencetech/article-11858339/Elon-Musk-says-theres-50-chance-SpaceXs-Starship-rocket-EXPLODE-launch.html)  of explosion 🚀🛰🔥 theory.
 
 Original version by https://github.com/Matt-DESTROYER as a Replit bounty project.
 
@@ -16,8 +15,7 @@ Fork, remix and make your own game!
 Let's have fun making games!
 
 <a href="https://twitter.com/arex"><img src="https://img.shields.io/twitter/follow/arex" alt="Follow @arex"></a>
-
-https://postmeta.com
+  [Postmeta.com](https://postmeta.com)
 
 ### Features
 
