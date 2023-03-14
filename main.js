@@ -34,7 +34,6 @@ function touchMouseReleased() {
 function setPosition(e) {
   e.preventDefault();
   if (e.type === 'touchstart' || e.type === 'mousedown') {
-    Input.ArrowUp = true;
     Input.MouseDown = true;
   }
   if (e.type === 'touchstart' || e.type === 'touchmove') {
@@ -44,13 +43,17 @@ function setPosition(e) {
     Input.x = e.clientX;
     Input.y = e.clientY;
   }
-  const sideWidth = canvas.width / 2;
-  if (sideWidth > Input.x) {
+  const halfWidth = canvas.width / 2;
+  const halfHeight = canvas.height / 2;
+  if (Input.y < halfHeight) {
+    Input.ArrowUp = true;
+  }
+  if (Input.x < halfWidth) {
     Input.ArrowLeft = true;
-  } else if (sideWidth < Input.x) {
+  } else if (Input.x > halfWidth) {
     Input.ArrowRight = true;
   }
-  Input.rotationAmplification = Math.abs(sideWidth - Input.x) / ((sideWidth + Input.x) / 2);
+  Input.rotationAmplification = Math.abs(halfWidth - Input.x) / ((halfWidth + Input.x) / 2);
   Input.thrustAmplification = ((canvas.height - Input.y) / canvas.height) * 1.5;
 }
 
@@ -93,7 +96,7 @@ class Game {
     // object to store info on the current objective
     this.objective = {
       name: 'space', // the current objectives name
-      text: 'Exit the atmosphere', // the text displayed explaining the current objective to the user
+      text: 'Get to orbit!', // the text displayed explaining the current objective to the user
       x: 0, // the x coordinate of the objective (if type is "location")
       y: -20000, // the y coordinate of the objective (if type is "location")
       type: 'location', // the type of objective
@@ -189,7 +192,7 @@ class Game {
     this.won = false;
     // reset the default objective
     this.objective.name = 'space';
-    this.objective.text = 'Exit the atmosphere';
+    this.objective.text = 'Get to orbit!';
     this.objective.x = 0;
     this.objective.y = -20000;
     this.objective.type = 'location';
@@ -225,7 +228,7 @@ class Game {
         if (Math.sqrt((this.ship.x - this.objective.x) ** 2 + (this.ship.y - this.objective.y) ** 2) < 1000) {
           // update the objective
           this.objective.name = 'Stage separation';
-          this.objective.text = 'Initiate stage separation (press e)';
+          this.objective.text = 'Initiate stage separation (press "e")';
           this.objective.type = 'interact';
           this.objective.controlShip = null;
         }
@@ -252,7 +255,7 @@ class Game {
           this.scene.add(this.ship);
           this.scene.add(this.shipBottom);
           this.objective.name = 'Starlink satellites';
-          this.objective.text = 'Release the starlink satellites (press e)';
+          this.objective.text = 'Release the Starlink satellites (press "e")';
           this.objective.type = 'interact';
         }
       } else if (this.objective.name === 'Starlink satellites') {
@@ -269,8 +272,8 @@ class Game {
               if (Math.abs(game.ship.x - this.x) > canvas.width || Math.abs(game.ship.y - this.y) > canvas.height) {
                 game.scene.remove(this);
                 if (this.id === 10) {
-                  game.objective.name = 'Earth';
-                  game.objective.text = 'Land the bottom half of the Starship (c to catch Starship)';
+                  game.objective.name = 'landing pad';
+                  game.objective.text = 'Land the booster (press "c" to catch Booster at tower arms)';
                   game.objective.type = 'location';
                   game.objective.x = 0;
                   game.objective.y = -80;
@@ -290,8 +293,8 @@ class Game {
           }
           this.starlinksReleased = true;
         }
-      } else if (this.objective.name === 'Earth') {
-        if (this.objective.text === 'Land the bottom half of the Starship (c to catch Starship)') {
+      } else if (this.objective.name === 'landing pad') {
+        if (this.objective.text === 'Land the booster (press "c" to catch Booster at tower arms)') {
           if ((this.input.KeyC || this.input.MouseDown) && Math.abs(this.ship.x - this.objective.x) < 50 && Math.abs(this.ship.y - this.objective.y) < 50 && (this.ship.rotation > 250 && this.ship.rotation < 290)) {
             this.input.KeyC = false;
             this.input.MouseDown = false;
@@ -300,9 +303,9 @@ class Game {
             this.ship = this.shipTop;
             this.objective.controlShip = this.ship;
             this.ship.addEventListener('update', this.ship.updateControl);
-            this.objective.text = 'Land the top half of the Starship (c to catch Starship)';
+            this.objective.text = 'Land the Starship (press "c" to catch Starship at tower arms)';
           }
-        } else if (this.objective.text === 'Land the top half of the Starship (c to catch Starship)') {
+        } else if (this.objective.text === 'Land the Starship (press "c" to catch Starship at tower arms)') {
           if ((this.input.KeyC || this.input.MouseDown) && Math.abs(this.ship.x - this.objective.x) < 50 && Math.abs(this.ship.y - this.objective.y) < 50 && (this.ship.rotation > 250 && this.ship.rotation < 290)) {
             this.input.KeyC = false;
             this.input.MouseDown = false;
@@ -439,7 +442,9 @@ class Game {
         ctx.fillText('Mission Success!', Math.floor(canvas.width / 2), Math.floor(canvas.height / 4));
       }
     } else {
-      ctx.fillText('Press space to start!', Math.floor(canvas.width / 2), Math.floor(canvas.height / 4));
+      ctx.fillText('Press space or tap to start!', Math.floor(canvas.width / 2), Math.floor(canvas.height / 4));
+      ctx.font = '1em Trebuchet MS';
+      ctx.fillText('On mobile, tap higher for thrust, lower half to rotate)', Math.floor(canvas.width / 2), Math.floor(canvas.height / 4) + 30);
     }
     // objective
     ctx.font = '1.5em Trebuchet MS';
