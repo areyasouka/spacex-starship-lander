@@ -14,7 +14,7 @@ Original version by https://github.com/Matt-DESTROYER as a Replit bounty project
 Fork, remix and make your own game!
 Let's have fun making games!
 
-<a href="https://twitter.com/arex"><img src="https://img.shields.io/twitter/follow/arex" alt="Follow @arex"></a>
+<a href="https://x.com/arex"><img src="https://img.shields.io/twitter/follow/arex" alt="Follow @arex"></a>
   [Postmeta.com](https://postmeta.com)
 
 ### Features
